@@ -19,41 +19,40 @@ def main():
     # start listening
     serversocket.listen(128)
 
-    while True:
-        # server - accept()
-        # try:
-        clientsocket, (client_address, client_port) = serversocket.accept()
-        print('New Client: {0}:{1}'.format(client_address,client_port))
-
+    try:
         while True:
-            try:
-                message = clientsocket.recv(1024)
-                print('Recv: {}'.format(message))
-            except OSError:
-                break
-            if len(message) == 0:
-                break
+            # server - accept()
+            # try:
+            clientsocket, (client_address, client_port) = serversocket.accept()
+            print('New Client: {0}:{1}'.format(client_address,client_port))
 
-            # echo back - set received message to sent_message
-            sent_message = message
             while True:
-                sent_len = clientsocket.send(sent_message)
-
-                if sent_len == len(sent_message):
+                try:
+                    message = clientsocket.recv(1024)
+                    print('Recv: {}'.format(message))
+                except OSError:
+                    break
+                if len(message) == 0:
                     break
 
-                sent_message = sent_message[sent_len:]
-            print('Send back: {}'.format(message))
-        
-        clientsocket.close()
-        print('Bye :) : {0}:{1}'.format(client_address, client_port))
+                # echo back - set received message to sent_message
+                sent_message = message
+                while True:
+                    sent_len = clientsocket.send(sent_message)
 
-        # except KeyboardInterrupt:
-        #     # close each sockets
-        #     print('Bye - client socket : {0}:{1}'.format(client_address, client_port))
-        #     print('Bye - server socket : {0}:{1}'.format(host, port))
-        #     clientsocket.close()
-        #     serversocket.close()
+                    if sent_len == len(sent_message):
+                        break
+
+                    sent_message = sent_message[sent_len:]
+                print('Send back: {}'.format(message))
+            
+            clientsocket.close()
+            print('Bye - client socket : {0}:{1}'.format(client_address, client_port))
+
+    except KeyboardInterrupt:
+        # close server socket
+        serversocket.close()
+        print('Bye - server socket : {0}:{1}'.format(host, port))
 
 if __name__ == "__main__":
     main()
